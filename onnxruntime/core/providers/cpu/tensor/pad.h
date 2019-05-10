@@ -35,7 +35,7 @@ class PadBase {
     ;  // Value is optional and initialized to 0 by default
   }
 
-  ~PadBase() {}
+  ~PadBase() = default;
 
   enum class Mode : int {
     Constant = 0,

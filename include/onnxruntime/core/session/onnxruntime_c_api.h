@@ -465,8 +465,7 @@ ORT_API(void, OrtReleaseAllocator, _In_ OrtAllocator* allocator);
 /**
  * \param msg A null-terminated string. Its content will be copied into the newly created OrtStatus
  */
-ORT_API(OrtStatus*, OrtCreateStatus, OrtErrorCode code, _In_ const char* msg)
-ORT_ALL_ARGS_NONNULL;
+ORT_API(OrtStatus*, OrtCreateStatus, OrtErrorCode code, _In_opt_ const char* msg);
 
 ORT_API(OrtErrorCode, OrtGetErrorCode, _In_ const OrtStatus* status)
 ORT_ALL_ARGS_NONNULL;
@@ -523,8 +522,7 @@ ORT_API_STATUS(OrtGetValueCount, const OrtValue* value, size_t* out);
    * sequence. 'in' should be an arrary of N OrtValues.
    * \value_type should be either map or sequence.
    */
-ORT_API_STATUS(OrtCreateValue, OrtValue** const in, int num_values, enum ONNXType value_type,
-               OrtValue** out);
+ORT_API_STATUS(OrtCreateValue, OrtValue** in, int num_values, enum ONNXType value_type, OrtValue** out);
 
 /*
  * EXPERIMENTAL APIS - Subject to change. Released as a preview to get feedback and enable early testing

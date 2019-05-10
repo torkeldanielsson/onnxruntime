@@ -42,8 +42,8 @@ TEST(MemcpyTest, copy1) {
   ASSERT_TRUE(st.IsOK()) << st.ErrorMessage();
   s.SetGraphViewer(std::make_unique<GraphViewer>(model.MainGraph()));
   PutAllNodesOnOneProvider(model.MainGraph(), onnxruntime::kCpuExecutionProvider);
-  SessionStateInitializer session_initializer{ORT_TSTR(""), model.MainGraph(), s, execution_providers,
-                                              kernel_registry_manager};
+  SessionStateInitializer session_initializer{true, ORT_TSTR(""),        model.MainGraph(),
+                                              s,    execution_providers, kernel_registry_manager};
   st = session_initializer.CreatePlan(nullptr, {}, true);
   ASSERT_TRUE(st.IsOK()) << st.ErrorMessage();
   st = session_initializer.InitializeAndSave(nullptr);

@@ -207,25 +207,28 @@ void TransformerMemcpyImpl::ProcessDefs(onnxruntime::Node& node, const KernelReg
 
 //for non_provider defs, collect the nodes that expect it is provider tensor as input/output.
 void TransformerMemcpyImpl::BuildDefsMapping(const onnxruntime::NodeArg* arg, const KernelRegistryManager& kernel_registries) {
-  for (auto it = graph_.Nodes().begin(); it != graph_.Nodes().end(); it++) {
-    if (it->OpType() == "MemcpyFromHost" || it->OpType() == "MemcpyToHost")
-      continue;
-    auto input_it = std::find(it->MutableInputDefs().begin(), it->MutableInputDefs().end(), const_cast<onnxruntime::NodeArg*>(arg));
-    auto output_it = std::find(it->MutableOutputDefs().begin(), it->MutableOutputDefs().end(), const_cast<onnxruntime::NodeArg*>(arg));
-    int arg_input_index = input_it != it->MutableInputDefs().end() ? static_cast<int>(input_it - it->MutableInputDefs().begin()) : -1;
-    int arg_output_index = output_it != it->MutableOutputDefs().end() ? static_cast<int>(output_it - it->MutableOutputDefs().begin()) : -1;
+  for (auto& it : graph_.Nodes()) {
+    if (it.OpType() == "MemcpyFromHost" || it.OpType() == "MemcpyToHost") continue;
+    auto input_it =
+        std::find(it.MutableInputDefs().begin(), it.MutableInputDefs().end(), const_cast<onnxruntime::NodeArg*>(arg));
+    auto output_it =
+        std::find(it.MutableOutputDefs().begin(), it.MutableOutputDefs().end(), const_cast<onnxruntime::NodeArg*>(arg));
+    int arg_input_index =
+        input_it != it.MutableInputDefs().end() ? static_cast<int>(input_it - it.MutableInputDefs().begin()) : -1;
+    int arg_output_index =
+        output_it != it.MutableOutputDefs().end() ? static_cast<int>(output_it - it.MutableOutputDefs().begin()) : -1;
     if (arg_input_index == -1 && arg_output_index == -1)
       continue;
-    if (it->GetExecutionProviderType() == provider_) {
+    if (it.GetExecutionProviderType() == provider_) {
       const KernelCreateInfo* kci = nullptr;
-      kernel_registries.SearchKernelRegistry(*it, &kci);
+      kernel_registries.SearchKernelRegistry(it, &kci);
       if (arg_input_index != -1) {
         if (!kci || !MemTypeOnCpuExplicitly(kci->kernel_def->InputMemoryType(arg_input_index)))
-          provider_input_nodes_[arg].insert(&*it);
+          provider_input_nodes_[arg].insert(&it);
       }
       if (arg_output_index != -1) {
         if (!kci || !MemTypeOnCpuExplicitly(kci->kernel_def->OutputMemoryType(arg_output_index)))
-          provider_output_nodes_[arg].insert(&*it);
+          provider_output_nodes_[arg].insert(&it);
       }
     }
   }
@@ -300,23 +303,21 @@ void TransformerMemcpyImpl::ProcessInitializers(const KernelRegistryManager& ker
 
     const KernelCreateInfo* kci = nullptr;
     kernel_registries.SearchKernelRegistry(*p_node, &kci);
-    p_node->ForEachWithIndex(
-        p_node->InputDefs(),
-        [kci, &dup_replacements](const onnxruntime::NodeArg& arg, size_t index) {
-          if (kci && MemTypeOnCpuExplicitly(kci->kernel_def->InputMemoryType(index)))
-            dup_replacements.erase(&arg);
-          return Status::OK();
-        });
+    onnxruntime::Node::ForEachWithIndex(p_node->InputDefs(),
+                                        [kci, &dup_replacements](const onnxruntime::NodeArg& arg, size_t index) {
+                                          if (kci && MemTypeOnCpuExplicitly(kci->kernel_def->InputMemoryType(index)))
+                                            dup_replacements.erase(&arg);
+                                          return Status::OK();
+                                        });
 
     // normally initializers are only inputs, but things may change with ops like assign
-    p_node->ForEachWithIndex(
-        p_node->OutputDefs(),
-        [kci, &dup_replacements](const onnxruntime::NodeArg& arg, size_t index) {
-          if (kci && MemTypeOnCpuExplicitly(kci->kernel_def->OutputMemoryType(index))) {
-            ORT_ENFORCE(dup_replacements.find(&arg) == dup_replacements.end());
-          }
-          return Status::OK();
-        });
+    onnxruntime::Node::ForEachWithIndex(p_node->OutputDefs(),
+                                        [kci, &dup_replacements](const onnxruntime::NodeArg& arg, size_t index) {
+                                          if (kci && MemTypeOnCpuExplicitly(kci->kernel_def->OutputMemoryType(index))) {
+                                            ORT_ENFORCE(dup_replacements.find(&arg) == dup_replacements.end());
+                                          }
+                                          return Status::OK();
+                                        });
 
     p_node->ReplaceDefs(dup_replacements);
   }

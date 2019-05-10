@@ -27,27 +27,27 @@ namespace ngraph_ep {
 static DType GetDataType(const ngraph::element::Type& ng_type) {
   switch (ng_type.get_type_enum()) {
     case ngraph::element::Type_t::f32:
-      return DType::TFloat32;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT;
     case ngraph::element::Type_t::f64:
-      return DType::TDouble;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_DOUBLE;
     case ngraph::element::Type_t::boolean:
-      return DType::TBool;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_BOOL;
     case ngraph::element::Type_t::u8:
-      return DType::TUint8;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_UINT8;
     case ngraph::element::Type_t::i8:
-      return DType::TInt8;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_INT8;
     case ngraph::element::Type_t::u16:
-      return DType::TUint16;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_UINT16;
     case ngraph::element::Type_t::i16:
-      return DType::TInt16;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_INT16;
     case ngraph::element::Type_t::u32:
-      return DType::TUint32;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_UINT32;
     case ngraph::element::Type_t::i32:
-      return DType::TInt32;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_INT32;
     case ngraph::element::Type_t::u64:
-      return DType::TUint64;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_UINT64;
     case ngraph::element::Type_t::i64:
-      return DType::TInt64;
+      return ONNX_TENSOR_ELEMENT_DATA_TYPE_INT64;
     default:
       throw "Unsupported DataType";
   }

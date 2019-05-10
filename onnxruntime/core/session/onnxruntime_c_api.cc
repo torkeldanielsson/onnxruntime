@@ -689,13 +689,15 @@ static OrtStatus* OrtGetValueCountImpl(const OrtValue* value, size_t* out) {
   if (value_type == ONNX_TYPE_MAP) {
     *out = NUM_MAP_INDICES;
     return nullptr;
-  } else if (value_type == ONNX_TYPE_SEQUENCE) {
+  }
+  if (value_type == ONNX_TYPE_SEQUENCE) {
     auto v = reinterpret_cast<const MLValue*>(value);
     auto type = v->Type();
     // Note: keep these in sync with the registered types in data_types.h
     if (type == DataTypeImpl::GetType<VectorString>()) {
       return OrtGetNumSequenceElements<VectorString>(v, out);
-    } else if (type == DataTypeImpl::GetType<VectorInt64>()) {
+    }
+    if (type == DataTypeImpl::GetType<VectorInt64>()) {
       return OrtGetNumSequenceElements<VectorInt64>(v, out);
     } else if (type == DataTypeImpl::GetType<VectorFloat>()) {
       return OrtGetNumSequenceElements<VectorFloat>(v, out);
@@ -809,7 +811,8 @@ static OrtStatus* OrtGetValueImplSeq(const OrtValue* value, int index, OrtAlloca
   // Note: keep these in sync with the registered types in data_types.h
   if (type == DataTypeImpl::GetType<VectorString>()) {
     return OrtGetValueImplSeqOfPrimitives<VectorString>(p_ml_value, index, allocator, out);
-  } else if (type == DataTypeImpl::GetType<VectorInt64>()) {
+  }
+  if (type == DataTypeImpl::GetType<VectorInt64>()) {
     return OrtGetValueImplSeqOfPrimitives<VectorInt64>(p_ml_value, index, allocator, out);
   } else if (type == DataTypeImpl::GetType<VectorFloat>()) {
     return OrtGetValueImplSeqOfPrimitives<VectorFloat>(p_ml_value, index, allocator, out);
@@ -866,7 +869,8 @@ static OrtStatus* OrtGetValueImplMap(const OrtValue* value, int index, OrtAlloca
   // Note: keep these in sync with the registered types in data_types.h
   if (type == DataTypeImpl::GetType<MapStringToString>()) {
     return OrtGetValueImplMapHelper<MapStringToString>(p_ml_value, index, allocator, out);
-  } else if (type == DataTypeImpl::GetType<MapStringToInt64>()) {
+  }
+  if (type == DataTypeImpl::GetType<MapStringToInt64>()) {
     return OrtGetValueImplMapHelper<MapStringToInt64>(p_ml_value, index, allocator, out);
   } else if (type == DataTypeImpl::GetType<MapStringToFloat>()) {
     return OrtGetValueImplMapHelper<MapStringToFloat>(p_ml_value, index, allocator, out);
@@ -890,7 +894,8 @@ static OrtStatus* OrtGetValueImpl(const OrtValue* value, int index, OrtAllocator
   auto value_type = OrtGetValueType(value);
   if (value_type == ONNX_TYPE_MAP) {
     return OrtGetValueImplMap(value, index, allocator, out);
-  } else if (value_type == ONNX_TYPE_SEQUENCE) {
+  }
+  if (value_type == ONNX_TYPE_SEQUENCE) {
     return OrtGetValueImplSeq(value, index, allocator, out);
   } else {
     return OrtCreateStatus(ORT_FAIL, "Input is not of type sequence or map.");
@@ -975,7 +980,8 @@ static OrtStatus* OrtCreateValueImplSeq(OrtValue** const in, int num_values, Ort
     auto vec_type = first_mlvalue->Get<Tensor>().DataType();
     if (vec_type == DataTypeImpl::GetType<std::string>()) {
       return OrtCreateValueImplSeqHelper<std::string>(in, num_values, out);
-    } else if (vec_type == DataTypeImpl::GetType<int64_t>()) {
+    }
+    if (vec_type == DataTypeImpl::GetType<int64_t>()) {
       return OrtCreateValueImplSeqHelper<int64_t>(in, num_values, out);
     } else if (vec_type == DataTypeImpl::GetType<float>()) {
       return OrtCreateValueImplSeqHelper<float>(in, num_values, out);
@@ -988,7 +994,8 @@ static OrtStatus* OrtCreateValueImplSeq(OrtValue** const in, int num_values, Ort
     auto map_type = first_mlvalue->Type();
     if (map_type == DataTypeImpl::GetType<MapStringToFloat>()) {
       return OrtCreateValueImplSeqHelperMap<MapStringToFloat>(in, num_values, out);
-    } else if (map_type == DataTypeImpl::GetType<MapInt64ToFloat>()) {
+    }
+    if (map_type == DataTypeImpl::GetType<MapInt64ToFloat>()) {
       return OrtCreateValueImplSeqHelperMap<MapInt64ToFloat>(in, num_values, out);
     } else {
       return OrtCreateStatus(ORT_FAIL, "Input is not of one of the supported map types.");
@@ -1025,7 +1032,8 @@ static OrtStatus* OrtCreateValueImplMapHelper(const Tensor& key_tensor, const Te
   auto value_type = value_tensor.DataType();
   if (value_type == DataTypeImpl::GetType<std::string>()) {
     return OrtCreateMapMLValue<KeyType, std::string>(key_tensor, value_tensor, out);
-  } else if (value_type == DataTypeImpl::GetType<int64_t>()) {
+  }
+  if (value_type == DataTypeImpl::GetType<int64_t>()) {
     return OrtCreateMapMLValue<KeyType, int64_t>(key_tensor, value_tensor, out);
   } else if (value_type == DataTypeImpl::GetType<float>()) {
     return OrtCreateMapMLValue<KeyType, float>(key_tensor, value_tensor, out);

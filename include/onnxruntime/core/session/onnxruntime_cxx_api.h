@@ -40,7 +40,7 @@ struct Exception : std::exception {
   Exception(std::string&& string, OrtErrorCode code) : message_{std::move(string)}, code_{code} {}
 
   OrtErrorCode GetOrtErrorCode() const { return code_; }
-  const char* what() const noexcept { return message_.c_str(); }
+  const char* what() const noexcept override { return message_.c_str(); }
 
  private:
   std::string message_;

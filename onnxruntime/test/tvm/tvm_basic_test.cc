@@ -75,10 +75,10 @@ class UnionSet {
 };
 
 static DLDataType GetDataType(DType type) {
-  if (type == DType::TDouble) {
+  if (type == ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT) {
     return {kDLFloat, 64, 1};
   } else
-    ORT_THROW("not implement.");
+    ORT_NOT_IMPLEMENTED("not implement.");
 }
 
 namespace test {
